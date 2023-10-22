@@ -1,20 +1,20 @@
 package dtos
 
-type PersonPatchDTO struct {
+type PatchPersonDTO struct {
 	Name       string                   `json:"name"`
 	Surname    string                   `json:"surname"`
 	Patronymic *string                  `json:"patronymic,omitempty"`
 	Age        *int64                   `json:"age,omitempty"`
-	Gender     *PersonPatchGenderDTO    `json:"gender,omitempty"`
-	Country    *[]PersonPatchCountryDTO `json:"country,omitempty"`
+	Gender     *PatchPersonGenderDTO    `json:"gender,omitempty"`
+	Country    *[]PatchPersonCountryDTO `json:"country,omitempty"`
 }
 
-type PersonPatchGenderDTO struct {
+type PatchPersonGenderDTO struct {
 	Gender      string  `json:"gender"`
 	Probability float32 `json:"probability"`
 }
 
-type PersonPatchCountryDTO struct {
+type PatchPersonCountryDTO struct {
 	CountryID   string  `json:"country_ID"`
 	Probability float32 `json:"probability"`
 }

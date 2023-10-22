@@ -5,6 +5,9 @@ go 1.21.1
 require (
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/caarlos0/env/v9 v9.0.0
+	github.com/go-chi/chi/v5 v5.0.10
+	github.com/go-chi/docgen v1.2.0
+	github.com/go-chi/render v1.0.3
 	github.com/gojek/heimdall v5.0.2+incompatible
 	github.com/guregu/null v4.0.0+incompatible
 	github.com/pressly/goose/v3 v3.15.1
@@ -18,6 +21,7 @@ require (
 
 require (
 	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5 // indirect
+	github.com/ajg/form v1.5.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect

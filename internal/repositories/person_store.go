@@ -87,7 +87,7 @@ func (r *PersonStoreRepository) DeleteManyByID(ids []string) error {
 	return nil
 }
 
-func (r *PersonStoreRepository) PatchByID(id int, d *dtos.PersonPatchDTO) error {
+func (r *PersonStoreRepository) PatchByID(id int, d *dtos.PatchPersonDTO) error {
 	p, err := r.FindByID(id)
 	if err != nil {
 		return err

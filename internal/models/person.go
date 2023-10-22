@@ -18,7 +18,7 @@ type Person struct {
 	Country []*PersonCountry `gorm:"foreignKey:PersonID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"country;"`
 }
 
-func (p *Person) MergeWithPatchDTO(d *dtos.PersonPatchDTO) {
+func (p *Person) MergeWithPatchDTO(d *dtos.PatchPersonDTO) {
 	if d.Name != "" {
 		p.Name = d.Name
 	}
