@@ -5,9 +5,9 @@ go 1.21.1
 require (
 	github.com/caarlos0/env/v9 v9.0.0
 	github.com/gojek/heimdall v5.0.2+incompatible
-	github.com/google/uuid v1.3.1
 	github.com/guregu/null v4.0.0+incompatible
 	github.com/pressly/goose/v3 v3.15.1
+	github.com/redis/go-redis/v9 v9.2.1
 	github.com/samber/lo v1.38.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
@@ -17,7 +17,9 @@ require (
 
 require (
 	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gojektech/heimdall v5.0.2+incompatible // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

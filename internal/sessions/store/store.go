@@ -9,7 +9,7 @@ import (
 
 type StoreSession struct {
 	db               *gorm.DB
-	PersonRepository *repositories.PersonRepository
+	PersonRepository *repositories.PersonStoreRepository
 }
 
 func NewStoreSession(cfg *config.DatabaseConfig) (*StoreSession, error) {
@@ -18,7 +18,7 @@ func NewStoreSession(cfg *config.DatabaseConfig) (*StoreSession, error) {
 		return nil, err
 	}
 
-	personRepository := repositories.NewPersonRepository(db)
+	personRepository := repositories.NewPersonStoreRepository(db)
 
 	return &StoreSession{
 		db,

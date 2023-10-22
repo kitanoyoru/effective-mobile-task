@@ -9,7 +9,7 @@ type Config struct {
 	Log      LogConfig
 	Crawler  CrawlerConfig
 	Database DatabaseConfig
-	Cache    CacheConfig
+	Cache    RedisConfig // REFACTOR: rename to CacheConfig where will be more drivers
 }
 
 type ServerConfig struct {
@@ -40,7 +40,14 @@ type DatabaseConfig struct {
 	Database string `env:"DATABASE_DB_NAME"`
 }
 
-type CacheConfig struct{}
+type RedisConfig struct {
+	Host     string `env:"CACHE_HOST"`
+	Port     string `env:"CACHE_PORT"`
+	Name     string `env:"CACHE_NAME"`
+	User     string `env:"CACHE_USER"`
+	Password string `env:"CACHE_PASSWORD"`
+	Database int    `env:"CACHE_DB_NAME"`
+}
 
 type UnmarshalOptions struct {
 	Dev bool
