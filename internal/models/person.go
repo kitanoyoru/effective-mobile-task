@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/guregu/null"
-	"github.com/kitanoyoru/effective-mobile-task/internal/dtos"
+	"github.com/kitanoyoru/effective-mobile-task/internal/requests"
 )
 
 type Person struct {
@@ -18,44 +18,43 @@ type Person struct {
 	Country []*PersonCountry `gorm:"foreignKey:PersonID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"country;"`
 }
 
-func (p *Person) MergeWithPatchDTO(d *dtos.PatchPersonDTO) {
-	if d.Name != "" {
-		p.Name = d.Name
+func (p *Person) MergeWithPatchRequest(req *requests.PatchPersonRequest) {
+	if req.Name != "" {
+		p.Name = req.Name
 	}
 
-	if d.Surname != "" {
-		p.Surname = d.Surname
+	if req.Surname != "" {
+		p.Surname = req.Surname
 	}
 
-	if d.Patronymic != nil {
-		p.Patronymic = null.StringFromPtr(d.Patronymic)
+	if req.Patronymic != nil {
+		p.Patronymic = null.StringFromPtr(req.Patronymic)
 	}
 
-	if d.Age != nil {
-		p.Age = null.IntFromPtr(d.Age)
+	if req.Age != nil {
+		p.Age = null.IntFromPtr(req.Age)
 	}
 
-	if d.Gender != nil {
+	if req.Gender != nil {
 		if p.Gender == nil {
 			p.Gender = &PersonGender{}
 		}
-		p.Gender.Gender = d.Gender.Gender
-		p.Gender.Probability = d.Gender.Probability
+		p.Gender.Gender = req.Gender.Gender
+		p.Gender.Probability = req.Gender.Probability
 	}
 
-	if d.Country != nil {
+	if req.Country != nil {
 		var countries []*PersonCountry
-		for _, countryDTO := range *d.Country {
+		for _, countryRequest := range *req.Country {
 			country := &PersonCountry{
-				CountryID:   countryDTO.CountryID,
-				Probability: countryDTO.Probability,
+				CountryID:   countryRequest.CountryID,
+				Probability: countryRequest.Probability,
 			}
 			countries = append(countries, country)
 		}
 		p.Country = countries
 	}
 }
-
 func (p *Person) TableName() string {
 	return "Person"
 }

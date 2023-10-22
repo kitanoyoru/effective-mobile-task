@@ -1,6 +1,8 @@
-package service
+package responses
 
-import "github.com/kitanoyoru/effective-mobile-task/internal/models"
+import (
+	"github.com/kitanoyoru/effective-mobile-task/internal/models"
+)
 
 type GetPersonResponse struct {
 	ID int `json:"id"`
@@ -15,7 +17,7 @@ type GetPersonResponse struct {
 	Country []*GetPersonCountryResponse `json:"country"`
 }
 
-func NewGetPersonResponseFromModel(model *models.Person) *GetPersonResponse {
+func NewGetPersonResponseFromModel(model models.Person) *GetPersonResponse {
 	r := &GetPersonResponse{}
 
 	r.ID = model.ID

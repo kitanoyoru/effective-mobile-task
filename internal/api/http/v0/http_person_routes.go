@@ -3,27 +3,37 @@ package v0
 import (
 	"net/http"
 
-	"github.com/go-chi/render"
-	"github.com/kitanoyoru/effective-mobile-task/internal/dtos"
-	"github.com/kitanoyoru/effective-mobile-task/internal/service"
+	"github.com/kitanoyoru/effective-mobile-task/internal/requests"
+	"github.com/kitanoyoru/effective-mobile-task/pkg/utils"
 )
 
-func getPersonRequestHandler(w http.ResponseWriter, r *http.Request) {
-	getPersonDto := r.Context().Value("personDTO").(*dtos.PersonGetDTO)
+func (api *HTTPApi) getPersonRequestHandler(w http.ResponseWriter, r *http.Request) {
+	getPersonRequet := r.Context().Value("GetPersonRequest").(*requests.GetPersonRequest)
 
-	resp, err := service.GetPersonResponse(getPersonDto)
+	resp, err := api.service.GetPersonResponse(r.Context(), getPersonRequet)
 	if err != nil {
-		render.Render(w, r, ErrRender(err))
+		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 
-	render.Render(w, r, resp)
+	utils.RespondwithJSON(w, http.StatusOK, resp)
+}
+
+func (api *HTTPApi) getFilterPersonRequestHandler(w http.ResponseWriter, r *http.Request) {
+	getFilterPersonRequest := r.Context().Value("GetFilterPersonRequest").(*requests.GetFilterPersonRequest)
+
+	resp, err := api.service.GetFilterPersonResponse(r.Context(), getFilterPersonRequest)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	utils.RespondwithJSON(w, http.StatusOK, resp)
 
 }
 
-func getListPersonRequestHandler(w http.ResponseWriter, r *http.Request) {}
+func (api *HTTPApi) postPersonRequestHandler(w http.ResponseWriter, r *http.Request) {}
 
-func postPersonRequestHandler(w http.ResponseWriter, r *http.Request) {}
+func (api *HTTPApi) patchPersonRequetHandler(w http.ResponseWriter, r *http.Request) {}
 
-func patchPersonRequetHandler(w http.ResponseWriter, r *http.Request) {}
-
-func deletePersonRequestHanndler(w http.ResponseWriter, r *http.Request) {}
+func (api *HTTPApi) deletePersonRequestHanndler(w http.ResponseWriter, r *http.Request) {}

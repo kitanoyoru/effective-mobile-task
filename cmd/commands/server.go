@@ -12,18 +12,6 @@ var serverCommand = &cobra.Command{
 	Short: "Start server",
 	Long:  "Need to write smth here",
 	Run: func(cmd *cobra.Command, args []string) {
-		s, err := store.NewStoreSession(&cfg.Database)
-		if err != nil {
-			log.Fatal(err)
-		}
 
-		err = s.PersonRepository.Save(&models.Person{
-			ID:      0,
-			Name:    "a",
-			Surname: "b",
-		})
-		if err != nil {
-			log.Fatal(err)
-		}
 	},
 }

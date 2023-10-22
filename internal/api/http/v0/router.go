@@ -1,11 +1,10 @@
 package v0
 
 import (
-	"net/http"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
+	"github.com/kitanoyoru/effective-mobile-task/internal/service"
 )
 
 const (
@@ -15,7 +14,17 @@ const (
 	apiPersonRoutesPrefix = "/person"
 )
 
-func InitHTTPRouter() *chi.Mux {
+type HTTPApi struct {
+	service *service.Service
+}
+
+func NewHTTPApi(service *service.Service) *HTTPApi {
+	return &HTTPApi{
+		service,
+	}
+}
+
+func (api *HTTPApi) GetHTTPRouter() *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -26,57 +35,17 @@ func InitHTTPRouter() *chi.Mux {
 
 	r.Route(apiPrefix, func(r chi.Router) {
 		r.Route(apiBaseRoutesPrefix, func(r chi.Router) {
-			r.Get("/", renderIndexPage)
-			r.Get("/version", renderAppVersionPage)
+			r.Get("/", api.renderIndexPage)
+			r.Get("/version", api.renderAppVersionPage)
 		})
 		r.Route(apiPersonRoutesPrefix, func(r chi.Router) {
-			r.With(GetPersonDTOCtx).Get("/", getPersonRequestHandler)
-			r.With(paginateMiddleware).Get("/list", getListPersonRequestHandler)
-			r.Post("/", postPersonRequestHandler)
-			r.Patch("/", patchPersonRequetHandler)
-			r.Delete("/", deletePersonRequestHanndler)
+			r.With(api.GetPersonRequestCtx).Get("/{person_id}", api.getPersonRequestHandler)
+			r.With(api.GetFilterPersonRequestCtx).Get("/", api.getFilterPersonRequestHandler)
+			r.Post("/", api.postPersonRequestHandler)
+			r.Patch("/", api.patchPersonRequetHandler)
+			r.Delete("/", api.deletePersonRequestHanndler)
 		})
 	})
 
 	return r
-}
-
-func paginateMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// just a stub.. some ideas are to look at URL query params for something like
-		// the page number, or the limit, and send a query cursor down the chain
-		next.ServeHTTP(w, r)
-	})
-}
-
-type ErrResponse struct {
-	Err            error `json:"-"`
-	HTTPStatusCode int   `json:"-"`
-
-	StatusText string `json:"status"`
-	AppCode    int64  `json:"code,omitempty"`
-	ErrorText  string `json:"error,omitempty"`
-}
-
-func (e *ErrResponse) Render(w http.ResponseWriter, r *http.Request) error {
-	render.Status(r, e.HTTPStatusCode)
-	return nil
-}
-
-func ErrInvalidRequest(err error) render.Renderer {
-	return &ErrResponse{
-		Err:            err,
-		HTTPStatusCode: 400,
-		StatusText:     "Invalid request.",
-		ErrorText:      err.Error(),
-	}
-}
-
-func ErrRender(err error) render.Renderer {
-	return &ErrResponse{
-		Err:            err,
-		HTTPStatusCode: 422,
-		StatusText:     "Error rendering response.",
-		ErrorText:      err.Error(),
-	}
 }

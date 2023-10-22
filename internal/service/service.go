@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/kitanoyoru/effective-mobile-task/internal/dtos"
-	"github.com/kitanoyoru/effective-mobile-task/internal/models"
+	"github.com/kitanoyoru/effective-mobile-task/internal/requests"
+	"github.com/kitanoyoru/effective-mobile-task/internal/responses"
 	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/cache"
 	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/store"
 )
@@ -14,31 +14,20 @@ type Service struct {
 	cache *cache.CacheSession
 }
 
-func (s *Service) GetPersonResponse(dto *dtos.PersonGetDTO) (*GetPersonResponse, error) {
-	var person *models.Person
-	var err error
-
-	if dto.WithFilter {
-		person, err = s.getPersonFromDB(dto)
-	} else {
-		person, err = s.getPersonFromCacheOrDB(dto)
-	}
-
+func (s *Service) GetPersonResponse(ctx context.Context, request *requests.GetPersonRequest) (*responses.GetPersonResponse, error) {
+	person, err := s.db.PersonRepository.Find(ctx, request)
 	if err != nil {
 		return nil, err
 	}
 
-	return NewGetPersonResponseFromModel(person), nil
+	return responses.NewGetPersonResponseFromModel(person), nil
 }
 
-func (s *Service) getPersonFromDB(dto dtos.PersonGetDTO) (*models.Person, error) {
-	return s.db.PersonRepository.FindByDTO(dto)
-}
-
-func (s *Service) getPersonFromCacheOrDB(dto GetPersonDTO) (*models.Person, error) {
-	person, err := s.cache.PersonRepository.GetPersonByID(context.Background(), string(*dto.ID))
+func (s *Service) GetFilterPersonResponse(ctx context.Context, request *requests.GetFilterPersonRequest) (*responses.GetFilterPersonResponse, error) {
+	persons, err := s.db.PersonRepository.Filter(ctx, request)
 	if err != nil {
-		person, err = s.db.PersonRepository.FindByID(*dto.ID)
+		return nil, err
 	}
-	return person, err
+
+	return responses.NewGetFilterPersonResponseFromModel(persons), nil
 }

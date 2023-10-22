@@ -1,6 +1,7 @@
 package crawler
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/url"
@@ -8,7 +9,7 @@ import (
 
 	"github.com/gojek/heimdall/hystrix"
 	"github.com/kitanoyoru/effective-mobile-task/internal/config"
-	"github.com/kitanoyoru/effective-mobile-task/internal/dtos"
+	"github.com/kitanoyoru/effective-mobile-task/internal/requests"
 	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/store"
 	"github.com/kitanoyoru/effective-mobile-task/pkg/pool"
 	"github.com/samber/lo"
@@ -71,7 +72,7 @@ func (c *CrawlerSession) AssignPatchPersonTask(id int, name string) {
 }
 
 func (c *CrawlerSession) crawlPatchPersonHandler(id int, sources []string) {
-	var person *dtos.PersonPatchDTO
+	var patchPersonRequest *requests.PatchPersonRequest
 
 	for _, source := range sources {
 		res, err := c.client.Get(source, nil)
@@ -84,11 +85,11 @@ func (c *CrawlerSession) crawlPatchPersonHandler(id int, sources []string) {
 			log.Error(err)
 		}
 
-		err = json.Unmarshal(body, &person)
+		err = json.Unmarshal(body, &patchPersonRequest)
 		if err != nil {
 			log.Error(err)
 		}
 	}
 
-	c.store.PersonRepository.PatchByID(id, person)
+	c.store.PersonRepository.PatchByID(context.Background(), id, patchPersonRequest)
 }

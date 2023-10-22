@@ -12,7 +12,7 @@ CREATE TABLE "Person"
 
 );
 
-CREATE TABLE "person_gender"
+CREATE TABLE "Person_gender"
 (
     "id"          SMALLINT PRIMARY KEY,
     "gender"      TEXT    NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE "person_gender"
     CONSTRAINT "FK_Person_gender_Person" FOREIGN KEY ("personid") REFERENCES "Person" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
-CREATE TABLE "person_country"
+CREATE TABLE "Person_country"
 (
     "id"          SMALLINT PRIMARY KEY,
     "probability" DECIMAL NOT NULL,

@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/kitanoyoru/effective-mobile-task/internal/dtos"
+	"github.com/guregu/null"
 	"github.com/kitanoyoru/effective-mobile-task/internal/models"
+	"github.com/kitanoyoru/effective-mobile-task/internal/requests"
 	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/events"
 	"gorm.io/gorm"
 )
@@ -27,79 +28,81 @@ func NewPersonStoreRepository(db *gorm.DB, bus *events.EventBusSession) *PersonS
 	}
 }
 
-func (r *PersonStoreRepository) Save(person *models.Person) error {
-	if err := r.db.Save(person).Error; err != nil {
+func (r *PersonStoreRepository) Save(ctx context.Context, req *requests.PostPersonRequest) error {
+	person := models.Person{
+		Name:       req.Name,
+		Surname:    req.Surname,
+		Patronymic: null.StringFromPtr(req.Patronymic),
+	}
+
+	if err := r.db.WithContext(ctx).Save(person).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (r *PersonStoreRepository) FindByID(id int) (*models.Person, error) {
+func (r *PersonStoreRepository) Find(ctx context.Context, req *requests.GetPersonRequest) (models.Person, error) {
 	var person models.Person
 
-	if err := r.db.Where(&models.Person{ID: id}).Take(&person).Error; err != nil {
-		return nil, err
+	search := models.Person{
+		ID: req.ID,
 	}
 
-	return &person, nil
+	if err := r.db.WithContext(ctx).Preload("Person_Gender").Preload("Person_Country").Where(&search).Take(&person).Error; err != nil {
+		return models.Person{}, err
+	}
+
+	return person, nil
 }
 
-func (r *PersonStoreRepository) FindAll() ([]*models.Person, error) {
-	var persons []*models.Person
+func (r *PersonStoreRepository) Filter(ctx context.Context, req *requests.GetFilterPersonRequest) ([]models.Person, error) {
+	var persons []models.Person
 
-	if err := r.db.Find(&persons).Error; err != nil {
+	search := models.Person{
+		ID:   req.ID,
+		Name: req.Name,
+	}
+
+	if err := r.db.WithContext(ctx).Preload("Person_Gender").Preload("Person_Country").Where(&search).Find(&persons).Error; err != nil {
 		return nil, err
 	}
 
 	return persons, nil
 }
 
-func (r *PersonStoreRepository) DeleteByID(id int) error {
-	if err := r.db.Delete(&models.Person{ID: id}).Error; err != nil {
+func (r *PersonStoreRepository) Delete(ctx context.Context, req *requests.DeletePersonRequest) error {
+	search := models.Person{
+		ID: req.ID,
+	}
+
+	if err := r.db.WithContext(ctx).Delete(&search).Error; err != nil {
 		return err
 	}
 
-	r.bus.PublishEvent(context.Background(), PersonDeletedEventTopic, events.PersonDeletedEvent{
+	r.bus.PublishEvent(ctx, PersonDeletedEventTopic, events.PersonDeletedEvent{
 		Type: events.PersonDeletedEventType,
 		Payload: events.PersonDeletedEventPayload{
-			ID: fmt.Sprint(id),
+			ID: fmt.Sprint(search.ID),
 		},
 	})
 
 	return nil
 }
 
-func (r *PersonStoreRepository) DeleteManyByID(ids []string) error {
-	if err := r.db.Where("ID in (?)", ids).Delete(&models.Person{}).Error; err != nil {
-		return err
-	}
-
-	for _, id := range ids {
-		r.bus.PublishEvent(context.Background(), PersonDeletedEventTopic, events.PersonDeletedEvent{
-			Type: events.PersonDeletedEventType,
-			Payload: events.PersonDeletedEventPayload{
-				ID: fmt.Sprint(id),
-			},
-		})
-	}
-
-	return nil
-}
-
-func (r *PersonStoreRepository) PatchByID(id int, d *dtos.PatchPersonDTO) error {
-	p, err := r.FindByID(id)
+func (r *PersonStoreRepository) PatchByID(ctx context.Context, id int, req *requests.PatchPersonRequest) error {
+	p, err := r.Find(ctx, &requests.GetPersonRequest{ID: id})
 	if err != nil {
 		return err
 	}
 
-	p.MergeWithPatchDTO(d)
+	p.MergeWithPatchRequest(req)
 
-	if err := r.Save(p); err != nil {
+	if err := r.db.WithContext(ctx).Save(p).Error; err != nil {
 		return err
 	}
 
-	r.bus.PublishEvent(context.Background(), PersonUpdatedEventTopic, events.PersonUpdatedEvent{
+	r.bus.PublishEvent(ctx, PersonUpdatedEventTopic, events.PersonUpdatedEvent{
 		Type: events.PersonUpdatedEventType,
 		Payload: events.PersonUpdatedEventPayload{
 			ID: fmt.Sprint(id),
