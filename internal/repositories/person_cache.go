@@ -7,7 +7,10 @@ import (
 	"time"
 
 	"github.com/kitanoyoru/effective-mobile-task/internal/models"
+	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/events"
 	"github.com/redis/go-redis/v9"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -18,12 +21,27 @@ const (
 
 type PersonCacheRepository struct {
 	client *redis.Client
+
+	bus                    *events.EventBusSession
+	personUpdatedCtxCancel context.CancelFunc
+	personDeletedCtxcancel context.CancelFunc
 }
 
-func NewPersonCacheRepository(client *redis.Client) *PersonCacheRepository {
-	return &PersonCacheRepository{
+func NewPersonCacheRepository(client *redis.Client, bus *events.EventBusSession) *PersonCacheRepository {
+	personDeletedCtx, personUpdatedCtxCancel := context.WithCancel(context.Background())
+	personUpdatedCtx, personDeletedCtxCancel := context.WithCancel(context.Background())
+
+	r := &PersonCacheRepository{
 		client,
+		bus,
+		personDeletedCtxCancel,
+		personUpdatedCtxCancel,
 	}
+
+	go bus.AsyncConsumeEvents(personDeletedCtx, PersonDeletedEventTopic, r.onPersonDeletedHandler)
+	go bus.AsyncConsumeEvents(personUpdatedCtx, PersonDeletedEventTopic, r.onPersonUpdatedHandler)
+
+	return r
 }
 
 func (r *PersonCacheRepository) GetPersonByID(ctx context.Context, id string) (*models.Person, error) {
@@ -62,6 +80,19 @@ func (r *PersonCacheRepository) DeletePersonByID(ctx context.Context, id string)
 	}
 
 	return nil
+}
+
+// REFACTOR: rewrite these handlers to the one generic function
+func (r *PersonCacheRepository) onPersonDeletedHandler(event events.PersonDeletedEvent) {
+	if err := r.DeletePersonByID(context.Background(), event.Payload.ID); err != nil {
+		log.Debugf("Failed to handle PersonDeletedEvent: %+v", err)
+	}
+}
+
+func (r *PersonCacheRepository) onPersonUpdatedHandler(event events.PersonUpdatedEvent) {
+	if err := r.DeletePersonByID(context.Background(), event.Payload.ID); err != nil {
+		log.Debugf("Failed to handle PersonUpdatedEvent: %+v", err)
+	}
 }
 
 func (r *PersonCacheRepository) getCacheKey(category, instance string) string {

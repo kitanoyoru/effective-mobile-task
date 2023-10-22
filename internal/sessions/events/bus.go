@@ -29,7 +29,7 @@ func (s *EventBusSession) PublishEvent(ctx context.Context, topic string, event 
 	}
 }
 
-func (s *EventBusSession) AsyncConsumeEvents(ctx context.Context, topic string, handler func()) {
+func (s *EventBusSession) AsyncConsumeEvents(ctx context.Context, topic string, handler any) {
 	s.bus.SubscribeAsync(topic, handler, false)
 
 	for {
@@ -37,6 +37,7 @@ func (s *EventBusSession) AsyncConsumeEvents(ctx context.Context, topic string, 
 		case <-ctx.Done():
 			log.Debugf("Ending consuming topic: %s", topic)
 			s.bus.WaitAsync()
+			s.bus.Unsubscribe(topic, handler)
 			return
 		}
 	}
