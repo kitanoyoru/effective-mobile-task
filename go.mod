@@ -3,6 +3,7 @@ module github.com/kitanoyoru/effective-mobile-task
 go 1.21.1
 
 require (
+	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/caarlos0/env/v9 v9.0.0
 	github.com/gojek/heimdall v5.0.2+incompatible
 	github.com/guregu/null v4.0.0+incompatible

@@ -55,6 +55,15 @@ func (r *PersonCacheRepository) SetPersonByID(ctx context.Context, id string, pe
 	return nil
 }
 
+func (r *PersonCacheRepository) DeletePersonByID(ctx context.Context, id string) error {
+	cacheKey := r.getCacheKey("id", id)
+	if err := r.client.Del(ctx, cacheKey).Err(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *PersonCacheRepository) getCacheKey(category, instance string) string {
 	return fmt.Sprintf("%s-%s: %s", PersonCachePrefix, category, instance)
 }
