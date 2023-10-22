@@ -19,7 +19,7 @@ func NewEventBusSession() *EventBusSession {
 	}
 }
 
-func (s *EventBusSession) PublishEvent(ctx context.Context, topic string, event EventType) {
+func (s *EventBusSession) PublishEvent(ctx context.Context, topic string, event any) {
 	select {
 	case <-ctx.Done():
 		log.Debug("PublishEvent timeout")
@@ -29,15 +29,15 @@ func (s *EventBusSession) PublishEvent(ctx context.Context, topic string, event 
 	}
 }
 
-func (s *EventBusSession) AsyncConsumeEvent(ctx context.Context, topic string, handler func()) {
+func (s *EventBusSession) AsyncConsumeEvents(ctx context.Context, topic string, handler func()) {
+	s.bus.SubscribeAsync(topic, handler, false)
+
 	for {
 		select {
 		case <-ctx.Done():
 			log.Debugf("Ending consuming topic: %s", topic)
+			s.bus.WaitAsync()
 			return
-
-		default:
-			s.bus.SubscribeAsync(topic, handler, false)
 		}
 	}
 }

@@ -1,23 +1,38 @@
 package repositories
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/kitanoyoru/effective-mobile-task/internal/dtos"
 	"github.com/kitanoyoru/effective-mobile-task/internal/models"
+	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/events"
 	"gorm.io/gorm"
 )
 
+const (
+	PersonDeletedEventTopic = "person:delete"
+	PersonUpdatedEventTopic = "person:update"
+)
+
 type PersonStoreRepository struct {
-	db *gorm.DB
+	db  *gorm.DB
+	bus *events.EventBusSession
 }
 
-func NewPersonStoreRepository(db *gorm.DB) *PersonStoreRepository {
+func NewPersonStoreRepository(db *gorm.DB, bus *events.EventBusSession) *PersonStoreRepository {
 	return &PersonStoreRepository{
 		db,
+		bus,
 	}
 }
 
 func (r *PersonStoreRepository) Save(person *models.Person) error {
-	return r.db.Save(person).Error
+	if err := r.db.Save(person).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *PersonStoreRepository) FindByID(id int) (*models.Person, error) {
@@ -41,11 +56,35 @@ func (r *PersonStoreRepository) FindAll() ([]*models.Person, error) {
 }
 
 func (r *PersonStoreRepository) DeleteByID(id int) error {
-	return r.db.Delete(&models.Person{ID: id}).Error
+	if err := r.db.Delete(&models.Person{ID: id}).Error; err != nil {
+		return err
+	}
+
+	r.bus.PublishEvent(context.Background(), PersonDeletedEventTopic, events.PersonDeletedEvent{
+		Type: events.PersonDeletedEventType,
+		Payload: events.PersonDeletedEventPayload{
+			ID: fmt.Sprint(id),
+		},
+	})
+
+	return nil
 }
 
 func (r *PersonStoreRepository) DeleteManyByID(ids []string) error {
-	return r.db.Where("ID in (?)", ids).Delete(&models.Person{}).Error
+	if err := r.db.Where("ID in (?)", ids).Delete(&models.Person{}).Error; err != nil {
+		return err
+	}
+
+	for _, id := range ids {
+		r.bus.PublishEvent(context.Background(), PersonDeletedEventTopic, events.PersonDeletedEvent{
+			Type: events.PersonDeletedEventType,
+			Payload: events.PersonDeletedEventPayload{
+				ID: fmt.Sprint(id),
+			},
+		})
+	}
+
+	return nil
 }
 
 func (r *PersonStoreRepository) PatchByID(id int, d *dtos.PersonPatchDTO) error {
@@ -56,5 +95,16 @@ func (r *PersonStoreRepository) PatchByID(id int, d *dtos.PersonPatchDTO) error 
 
 	p.MergeWithPatchDTO(d)
 
-	return r.Save(p)
+	if err := r.Save(p); err != nil {
+		return err
+	}
+
+	r.bus.PublishEvent(context.Background(), PersonUpdatedEventTopic, events.PersonUpdatedEvent{
+		Type: events.PersonUpdatedEventType,
+		Payload: events.PersonUpdatedEventPayload{
+			ID: fmt.Sprint(id),
+		},
+	})
+
+	return nil
 }
