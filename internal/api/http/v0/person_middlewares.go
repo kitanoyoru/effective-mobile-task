@@ -20,6 +20,9 @@ func (api *HTTPApi) GetPersonRequestCtx(next http.Handler) http.Handler {
 		if id := chi.URLParam(r, "person_id"); id != "" {
 			pid, _ := strconv.Atoi(id)
 			getPersonRequest.ID = pid
+		} else {
+			utils.RespondWithError(w, http.StatusBadRequest, "id must be specified and be a part of the path")
+			return
 		}
 
 		ctx := context.WithValue(r.Context(), "GetPersonRequest", &getPersonRequest)
@@ -73,12 +76,40 @@ func (api *HTTPApi) DeletePersonRequestCtx(next http.Handler) http.Handler {
 			deletePersonRequest requests.DeletePersonRequest
 		)
 
-		if err := json.NewDecoder(r.Body).Decode(&deletePersonRequest); err != nil {
-			utils.RespondWithError(w, http.StatusBadRequest, err.Error())
+		if id := chi.URLParam(r, "person_id"); id != "" {
+			pid, _ := strconv.Atoi(id)
+			deletePersonRequest.ID = pid
+		} else {
+			utils.RespondWithError(w, http.StatusBadRequest, "id must be specified and be a part of the path")
 			return
 		}
 
 		ctx := context.WithValue(r.Context(), "DeletePersonRequest", &deletePersonRequest)
+
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func (api *HTTPApi) PatchPersonRequestCtx(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var (
+			patchPersonRequest requests.PatchPersonRequest
+		)
+
+		if id := chi.URLParam(r, "person_id"); id != "" {
+			pid, _ := strconv.Atoi(id)
+			patchPersonRequest.ID = pid
+		} else {
+			utils.RespondWithError(w, http.StatusBadRequest, "id must be specified and be a part of the path")
+			return
+		}
+
+		if err := json.NewDecoder(r.Body).Decode(&patchPersonRequest); err != nil {
+			utils.RespondWithError(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), "PatchPersonRequest", &patchPersonRequest)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

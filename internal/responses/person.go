@@ -91,3 +91,7 @@ func NewGetPersonCountryResponseFromModel(model *models.PersonCountry) *GetPerso
 type PostPersonResponse struct {
 	ID int `json:"id"`
 }
+
+type PatchPersonResponse struct {
+	ID int `json:"id"`
+}

@@ -42,8 +42,8 @@ func (api *HTTPApi) GetHTTPRouter() *chi.Mux {
 			r.With(api.GetPersonRequestCtx).Get("/{person_id}", api.getPersonRequestHandler)
 			r.With(api.GetFilterPersonRequestCtx).Get("/", api.getFilterPersonRequestHandler)
 			r.With(api.PostPersonRequestCtx).Post("/", api.postPersonRequestHandler)
-			r.Patch("/", api.patchPersonRequetHandler)
-			r.With(api.DeletePersonRequestCtx).Delete("/", api.deletePersonRequestHanndler)
+			r.With(api.PatchPersonRequestCtx).Patch("/{person_id}", api.patchPersonRequestHandler)
+			r.With(api.DeletePersonRequestCtx).Delete("/{person_id}", api.deletePersonRequestHanndler)
 		})
 	})
 

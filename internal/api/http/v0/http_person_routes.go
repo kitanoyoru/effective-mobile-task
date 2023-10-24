@@ -47,13 +47,22 @@ func (api *HTTPApi) postPersonRequestHandler(w http.ResponseWriter, r *http.Requ
 	utils.RespondWithJSON(w, http.StatusOK, resp)
 }
 
-func (api *HTTPApi) patchPersonRequetHandler(w http.ResponseWriter, r *http.Request) {
-}
-
 func (api *HTTPApi) deletePersonRequestHanndler(w http.ResponseWriter, r *http.Request) {
 	deletePersonRequest := r.Context().Value("DeletePersonRequest").(*requests.DeletePersonRequest)
 
 	resp, err := api.service.DeletePerson(r.Context(), deletePersonRequest)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	utils.RespondWithJSON(w, http.StatusOK, resp)
+}
+
+func (api *HTTPApi) patchPersonRequestHandler(w http.ResponseWriter, r *http.Request) {
+	patchPersonRequest := r.Context().Value("PatchPersonRequest").(*requests.PatchPersonRequest)
+
+	resp, err := api.service.PatchPerson(r.Context(), patchPersonRequest)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return

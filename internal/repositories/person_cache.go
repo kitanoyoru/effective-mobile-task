@@ -42,7 +42,7 @@ func NewPersonCacheRepository(client *redis.Client, bus *events.EventBusSession)
 	}
 
 	go bus.AsyncConsumeEvents(personDeletedCtx, events.PersonDeletedEventTopic, r.onPersonDeletedHandler)
-	go bus.AsyncConsumeEvents(personUpdatedCtx, events.PersonDeletedEventTopic, r.onPersonUpdatedHandler)
+	go bus.AsyncConsumeEvents(personUpdatedCtx, events.PersonUpdatedEventTopic, r.onPersonUpdatedHandler)
 	go bus.AsyncConsumeEvents(personGetCtx, events.PersonGetEventTopic, r.onPersonGetHander)
 
 	return r
@@ -86,7 +86,6 @@ func (r *PersonCacheRepository) DeletePersonByID(ctx context.Context, id string)
 	return nil
 }
 
-// REFACTOR: rewrite these handlers to the one generic function
 func (r *PersonCacheRepository) onPersonDeletedHandler(event events.PersonDeletedEvent) {
 	if err := r.DeletePersonByID(context.Background(), event.Payload.ID); err != nil {
 		log.Debugf("Failed to handle PersonDeletedEvent: %+v", err)

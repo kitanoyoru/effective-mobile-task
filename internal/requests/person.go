@@ -14,6 +14,7 @@ type GetPersonRequest struct {
 }
 
 type PatchPersonRequest struct {
+	ID                int                         `json:"id,omitempty"`
 	Name              string                      `json:"name"`
 	Surname           string                      `json:"surname"`
 	Patronymic        string                      `json:"patronymic,omitempty"`
