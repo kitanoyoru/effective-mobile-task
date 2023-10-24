@@ -18,7 +18,9 @@ func ConnectToDB(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 		return nil, err
 	}
 
-	return gorm.Open(driver, &gorm.Config{})
+	return gorm.Open(driver, &gorm.Config{
+		FullSaveAssociations: true,
+	})
 }
 
 func getDialector(cfg *config.DatabaseConfig) (gorm.Dialector, error) {

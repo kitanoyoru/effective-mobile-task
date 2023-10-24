@@ -1,5 +1,18 @@
 package requests
 
+type DeletePersonRequest struct {
+	ID int `json:"id"`
+}
+
+type GetFilterPersonRequest struct {
+	ID   int    `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
+}
+
+type GetPersonRequest struct {
+	ID int `json:"id,omitempty"`
+}
+
 type PatchPersonRequest struct {
 	Name              string                      `json:"name"`
 	Surname           string                      `json:"surname"`
@@ -11,6 +24,12 @@ type PatchPersonRequest struct {
 }
 
 type PatchPersonCountryRequest struct {
-	CountryID   string  `json:"country_ID"`
+	CountryID   string  `json:"country_id"`
 	Probability float32 `json:"probability"`
+}
+
+type PostPersonRequest struct {
+	Name       string  `json:"name"`
+	Surname    string  `json:"surname"`
+	Patronymic *string `json:"patronymic,omitempty"`
 }

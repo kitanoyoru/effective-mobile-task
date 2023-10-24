@@ -2,14 +2,12 @@ package repositories
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/guregu/null"
 	"github.com/kitanoyoru/effective-mobile-task/internal/models"
 	"github.com/kitanoyoru/effective-mobile-task/internal/requests"
 	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/events"
-	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -52,7 +50,7 @@ func (r *PersonStoreRepository) Find(ctx context.Context, req *requests.GetPerso
 		ID: req.ID,
 	}
 
-	if err := r.db.WithContext(ctx).Model(models.Person{}).Preload("Gender").Preload("Country").Where(&search).Take(&person).Error; err != nil {
+	if err := r.db.WithContext(ctx).Preload("Gender").Preload("Country").Where(&search).Take(&person).Error; err != nil {
 		return models.Person{}, err
 	}
 
@@ -108,10 +106,7 @@ func (r *PersonStoreRepository) PatchByID(ctx context.Context, id int, req *requ
 
 	p.MergeWithPatchRequest(req)
 
-	b, _ := json.Marshal(p)
-	logrus.Debug(string(b))
-
-	if err := r.db.WithContext(ctx).Preload("Gender").Preload("Country").Updates(p).Error; err != nil {
+	if err := r.db.WithContext(ctx).Preload("Gender").Preload("Country").Save(&p).Error; err != nil {
 		return err
 	}
 

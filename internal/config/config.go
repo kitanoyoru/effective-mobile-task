@@ -30,7 +30,7 @@ type LogConfig struct {
 }
 
 type CrawlerConfig struct {
-	Size int `env:"CRAWLER_GORS_COUNT" envDefault:"12"`
+	Size int `env:"CRAWLER_GORS_COUNT" envDefault:"4"`
 }
 
 type DatabaseConfig struct {

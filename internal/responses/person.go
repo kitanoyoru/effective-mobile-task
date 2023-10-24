@@ -1,8 +1,24 @@
 package responses
 
-import (
-	"github.com/kitanoyoru/effective-mobile-task/internal/models"
-)
+import "github.com/kitanoyoru/effective-mobile-task/internal/models"
+
+type DeletePersonResponse struct {
+	ID int `json:"id"`
+}
+
+type GetFilterPersonResponse struct {
+	Persons []*GetPersonResponse `json:"persons"`
+}
+
+func NewGetFilterPersonResponseFromModel(models []models.Person) *GetFilterPersonResponse {
+	r := GetFilterPersonResponse{}
+
+	for _, model := range models {
+		r.Persons = append(r.Persons, NewGetPersonResponseFromModel(model))
+	}
+
+	return &r
+}
 
 type GetPersonResponse struct {
 	ID int `json:"id"`
@@ -32,12 +48,10 @@ func NewGetPersonResponseFromModel(model models.Person) *GetPersonResponse {
 		r.Age = model.Age.Int64
 	}
 
-	if model.Gender != nil {
-		r.Gender = NewGetPersonGenderResponseFromModel(model.Gender)
-	}
+	r.Gender = NewGetPersonGenderResponseFromModel(&model.Gender)
 	if len(model.Country) > 0 {
 		for _, c := range model.Country {
-			r.Country = append(r.Country, NewGetPersonCountryResponseFromModel(c))
+			r.Country = append(r.Country, NewGetPersonCountryResponseFromModel(&c))
 
 		}
 	}
@@ -72,4 +86,8 @@ func NewGetPersonCountryResponseFromModel(model *models.PersonCountry) *GetPerso
 
 	return &r
 
+}
+
+type PostPersonResponse struct {
+	ID int `json:"id"`
 }

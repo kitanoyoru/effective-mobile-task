@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/kitanoyoru/effective-mobile-task/internal/models"
 	"github.com/kitanoyoru/effective-mobile-task/internal/requests"
@@ -27,13 +26,13 @@ func (s *Service) GetPerson(ctx context.Context, request *requests.GetPersonRequ
 	var person models.Person
 	var err error
 
-	person, err = s.cache.PersonRepository.GetPersonByID(ctx, fmt.Sprint(request.ID))
+	//person, err = s.cache.PersonRepository.GetPersonByID(ctx, fmt.Sprint(request.ID))
+	//if err != nil {
+	person, err = s.db.PersonRepository.Find(ctx, request)
 	if err != nil {
-		person, err = s.db.PersonRepository.Find(ctx, request)
-		if err != nil {
-			return nil, err
-		}
+		return nil, err
 	}
+	//}
 
 	return responses.NewGetPersonResponseFromModel(person), nil
 }

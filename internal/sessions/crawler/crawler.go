@@ -103,7 +103,7 @@ func (c *CrawlerSession) crawlPatchPersonHandler(id int, sources []string) {
 
 		err = json.Unmarshal(body, &patchPersonRequest)
 		if err != nil {
-			log.Error(err)
+			log.Errorf("Here %v", err)
 			return
 		}
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 type PersonGender struct {
-	ID string `gorm:"primary_key" json:"id"`
+	ID int `gorm:"primary_key" json:"id"`
 
 	Gender      string  `gorm:"column:gender;type:TEXT;NOT NULL" json:"gender"`
 	Probability float32 `gorm:"column:probability;type:FLOAT;NOT NULL" json:"probability"`
@@ -19,11 +19,11 @@ func (p *PersonGender) TableName() string {
 }
 
 type PersonCountry struct {
-	ID string `gorm:"primary_key" json:"id"`
+	ID int `gorm:"primary_key" json:"id"`
 
 	PersonID int `json:"-"`
 
-	CountryID   string  `gorm:"column:id;type:TEXT;NOT NULL" json:"country_id"`
+	CountryID   string  `gorm:"column:country_id;type:TEXT;NOT NULL" json:"country_id"`
 	Probability float32 `gorm:"column:probability;type:FLOAT;NOT NULL" json:"probability"`
 }
 
@@ -40,10 +40,10 @@ type Person struct {
 	Patronymic null.String `gorm:"column:patronymic;type:TEXT" json:"patronymic,omitempty"`
 	Age        null.Int    `gorm:"column:age;type:INT" json:"age,omitempty"`
 
-	GenderID *int          `json:"-"`
-	Gender   *PersonGender `gorm:"foreignKey:GenderID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"gender"`
+	GenderID *int         `json:"-"`
+	Gender   PersonGender `gorm:"foreignKey:GenderID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"gender,omitempty"`
 
-	Country []*PersonCountry `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"country"`
+	Country []PersonCountry `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"country,omitempty"`
 }
 
 func (p *Person) MergeWithPatchRequest(req *requests.PatchPersonRequest) {
@@ -64,17 +64,14 @@ func (p *Person) MergeWithPatchRequest(req *requests.PatchPersonRequest) {
 	}
 
 	if req.Gender != "" && req.GenderProbability != 0.0 {
-		if p.Gender == nil {
-			p.Gender = &PersonGender{}
-			p.Gender.Gender = req.Gender
-			p.Gender.Probability = req.GenderProbability
-		}
+		p.Gender.Gender = req.Gender
+		p.Gender.Probability = req.GenderProbability
 	}
 
 	if req.Country != nil {
-		var countries []*PersonCountry
+		var countries []PersonCountry
 		for _, countryRequest := range req.Country {
-			country := &PersonCountry{
+			country := PersonCountry{
 				CountryID:   countryRequest.CountryID,
 				Probability: countryRequest.Probability,
 			}
