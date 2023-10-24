@@ -12,6 +12,7 @@ import (
 	"github.com/kitanoyoru/effective-mobile-task/internal/config"
 	"github.com/kitanoyoru/effective-mobile-task/internal/service"
 	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/cache"
+	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/crawler"
 	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/events"
 	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/store"
 	log "github.com/sirupsen/logrus"
@@ -35,6 +36,8 @@ type App struct {
 	cache  *cache.CacheSession
 	events *events.EventBusSession
 
+	crawler *crawler.CrawlerSession
+
 	httpServer *http.Server
 }
 
@@ -45,7 +48,12 @@ func NewApp(cfg *config.Config) (*App, error) {
 
 	app.events = events.NewEventBusSession()
 
-	log.Info(app.cfg.Database)
+	level, err := log.ParseLevel(app.cfg.Log.LogLevel)
+	if err != nil {
+		return nil, err
+	}
+	log.SetLevel(level)
+
 	storeSession, err := store.NewStoreSession(&app.cfg.Database, app.events)
 	if err != nil {
 		return nil, err
@@ -57,6 +65,8 @@ func NewApp(cfg *config.Config) (*App, error) {
 		return nil, err
 	}
 	app.cache = cacheSession
+
+	app.crawler = crawler.NewCrawlerSession(&app.cfg.Crawler, app.events, app.store)
 
 	app.service = service.NewService(app.store, app.cache)
 

@@ -2,18 +2,15 @@ package repositories
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/guregu/null"
 	"github.com/kitanoyoru/effective-mobile-task/internal/models"
 	"github.com/kitanoyoru/effective-mobile-task/internal/requests"
 	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/events"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-)
-
-const (
-	PersonDeletedEventTopic = "person:delete"
-	PersonUpdatedEventTopic = "person:update"
 )
 
 type PersonStoreRepository struct {
@@ -37,6 +34,14 @@ func (r *PersonStoreRepository) Save(ctx context.Context, req *requests.PostPers
 
 	err := r.db.WithContext(ctx).Save(&person).Error
 
+	r.bus.PublishEvent(ctx, events.PersonPostEventTopic, events.PersonPostEvent{
+		Type: events.PersonPostEventType,
+		Payload: events.PersonPostEventPayload{
+			ID:   person.ID,
+			Name: person.Name,
+		},
+	})
+
 	return person.ID, err
 }
 
@@ -50,6 +55,13 @@ func (r *PersonStoreRepository) Find(ctx context.Context, req *requests.GetPerso
 	if err := r.db.WithContext(ctx).Model(models.Person{}).Preload("Gender").Preload("Country").Where(&search).Take(&person).Error; err != nil {
 		return models.Person{}, err
 	}
+
+	r.bus.PublishEvent(ctx, events.PersonGetEventTopic, events.PersonGetEvent{
+		Type: events.PersonGetEventType,
+		Payload: events.PersonGetEventPayload{
+			Person: person,
+		},
+	})
 
 	return person, nil
 }
@@ -78,7 +90,7 @@ func (r *PersonStoreRepository) Delete(ctx context.Context, req *requests.Delete
 		return err
 	}
 
-	r.bus.PublishEvent(ctx, PersonDeletedEventTopic, events.PersonDeletedEvent{
+	r.bus.PublishEvent(ctx, events.PersonDeletedEventTopic, events.PersonDeletedEvent{
 		Type: events.PersonDeletedEventType,
 		Payload: events.PersonDeletedEventPayload{
 			ID: fmt.Sprint(search.ID),
@@ -96,11 +108,14 @@ func (r *PersonStoreRepository) PatchByID(ctx context.Context, id int, req *requ
 
 	p.MergeWithPatchRequest(req)
 
-	if err := r.db.WithContext(ctx).Save(p).Error; err != nil {
+	b, _ := json.Marshal(p)
+	logrus.Debug(string(b))
+
+	if err := r.db.WithContext(ctx).Preload("Gender").Preload("Country").Updates(p).Error; err != nil {
 		return err
 	}
 
-	r.bus.PublishEvent(ctx, PersonUpdatedEventTopic, events.PersonUpdatedEvent{
+	r.bus.PublishEvent(ctx, events.PersonUpdatedEventTopic, events.PersonUpdatedEvent{
 		Type: events.PersonUpdatedEventType,
 		Payload: events.PersonUpdatedEventPayload{
 			ID: fmt.Sprint(id),

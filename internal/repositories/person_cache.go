@@ -25,21 +25,25 @@ type PersonCacheRepository struct {
 	bus                    *events.EventBusSession
 	personUpdatedCtxCancel context.CancelFunc
 	personDeletedCtxcancel context.CancelFunc
+	personnGetCtxCancel    context.CancelFunc
 }
 
 func NewPersonCacheRepository(client *redis.Client, bus *events.EventBusSession) *PersonCacheRepository {
 	personDeletedCtx, personUpdatedCtxCancel := context.WithCancel(context.Background())
 	personUpdatedCtx, personDeletedCtxCancel := context.WithCancel(context.Background())
+	personGetCtx, personGetCtxCancel := context.WithCancel(context.Background())
 
 	r := &PersonCacheRepository{
 		client,
 		bus,
 		personDeletedCtxCancel,
 		personUpdatedCtxCancel,
+		personGetCtxCancel,
 	}
 
-	go bus.AsyncConsumeEvents(personDeletedCtx, PersonDeletedEventTopic, r.onPersonDeletedHandler)
-	go bus.AsyncConsumeEvents(personUpdatedCtx, PersonDeletedEventTopic, r.onPersonUpdatedHandler)
+	go bus.AsyncConsumeEvents(personDeletedCtx, events.PersonDeletedEventTopic, r.onPersonDeletedHandler)
+	go bus.AsyncConsumeEvents(personUpdatedCtx, events.PersonDeletedEventTopic, r.onPersonUpdatedHandler)
+	go bus.AsyncConsumeEvents(personGetCtx, events.PersonGetEventTopic, r.onPersonGetHander)
 
 	return r
 }
@@ -59,13 +63,13 @@ func (r *PersonCacheRepository) GetPersonByID(ctx context.Context, id string) (m
 	return person, nil
 }
 
-func (r *PersonCacheRepository) SetPersonByID(ctx context.Context, id string, person *models.Person) error {
+func (r *PersonCacheRepository) SetPersonByID(ctx context.Context, person models.Person) error {
 	personBytes, err := json.Marshal(person)
 	if err != nil {
 		return err
 	}
 
-	cacheKey := r.getCacheKey("id", id)
+	cacheKey := r.getCacheKey("id", fmt.Sprint(person.ID))
 	if err = r.client.Set(ctx, cacheKey, personBytes, defaultPersonCacheTTL).Err(); err != nil {
 		return err
 	}
@@ -92,6 +96,12 @@ func (r *PersonCacheRepository) onPersonDeletedHandler(event events.PersonDelete
 func (r *PersonCacheRepository) onPersonUpdatedHandler(event events.PersonUpdatedEvent) {
 	if err := r.DeletePersonByID(context.Background(), event.Payload.ID); err != nil {
 		log.Debugf("Failed to handle PersonUpdatedEvent: %+v", err)
+	}
+}
+
+func (r *PersonCacheRepository) onPersonGetHander(event events.PersonGetEvent) {
+	if err := r.SetPersonByID(context.Background(), event.Payload.Person); err != nil {
+		log.Debugf("Failed to handle PersonGetEvent: %+v", err)
 	}
 }
 

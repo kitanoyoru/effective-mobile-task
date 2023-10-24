@@ -10,8 +10,8 @@ import (
 type PersonGender struct {
 	ID string `gorm:"primary_key" json:"id"`
 
-	Gender      string  `gorm:"column:gender;type:TEXT;not null" json:"gender"`
-	Probability float32 `gorm:"column:probability;type:FLOAT;not null" json:"probability"`
+	Gender      string  `gorm:"column:gender;type:TEXT;NOT NULL" json:"gender"`
+	Probability float32 `gorm:"column:probability;type:FLOAT;NOT NULL" json:"probability"`
 }
 
 func (p *PersonGender) TableName() string {
@@ -23,8 +23,8 @@ type PersonCountry struct {
 
 	PersonID int `json:"-"`
 
-	CountryID   string  `gorm:"column:id;type:TEXT;not null" json:"country_id"`
-	Probability float32 `gorm:"column:probability;type:FLOAT;not null" json:"probability"`
+	CountryID   string  `gorm:"column:id;type:TEXT;NOT NULL" json:"country_id"`
+	Probability float32 `gorm:"column:probability;type:FLOAT;NOT NULL" json:"probability"`
 }
 
 func (p *PersonCountry) TableName() string {
@@ -34,16 +34,16 @@ func (p *PersonCountry) TableName() string {
 type Person struct {
 	ID int `gorm:"primary_key" json:"id"`
 
-	Name    string `gorm:"column:name;type:TEXT;not null" json:"name"`
-	Surname string `gorm:"column:surname;type:TEXT;not null" json:"surname"`
+	Name    string `gorm:"column:name;type:TEXT;NOT NULL" json:"name"`
+	Surname string `gorm:"column:surname;type:TEXT;NOT NULL" json:"surname"`
 
 	Patronymic null.String `gorm:"column:patronymic;type:TEXT" json:"patronymic,omitempty"`
 	Age        null.Int    `gorm:"column:age;type:INT" json:"age,omitempty"`
 
-	GenderID *int         `json:"-"`
-	Gender   PersonGender `gorm:"foreignKey:GenderID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"gender"`
+	GenderID *int          `json:"-"`
+	Gender   *PersonGender `gorm:"foreignKey:GenderID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"gender"`
 
-	Country []PersonCountry `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"country"`
+	Country []*PersonCountry `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"country"`
 }
 
 func (p *Person) MergeWithPatchRequest(req *requests.PatchPersonRequest) {
@@ -55,23 +55,26 @@ func (p *Person) MergeWithPatchRequest(req *requests.PatchPersonRequest) {
 		p.Surname = req.Surname
 	}
 
-	if req.Patronymic != nil {
-		p.Patronymic = null.StringFromPtr(req.Patronymic)
+	if req.Patronymic != "" {
+		p.Patronymic = null.StringFrom(req.Patronymic)
 	}
 
-	if req.Age != nil {
-		p.Age = null.IntFromPtr(req.Age)
+	if req.Age != 0 {
+		p.Age = null.IntFrom(req.Age)
 	}
 
-	if req.Gender != nil {
-		p.Gender.Gender = req.Gender.Gender
-		p.Gender.Probability = req.Gender.Probability
+	if req.Gender != "" && req.GenderProbability != 0.0 {
+		if p.Gender == nil {
+			p.Gender = &PersonGender{}
+			p.Gender.Gender = req.Gender
+			p.Gender.Probability = req.GenderProbability
+		}
 	}
 
 	if req.Country != nil {
-		var countries []PersonCountry
-		for _, countryRequest := range *req.Country {
-			country := PersonCountry{
+		var countries []*PersonCountry
+		for _, countryRequest := range req.Country {
+			country := &PersonCountry{
 				CountryID:   countryRequest.CountryID,
 				Probability: countryRequest.Probability,
 			}

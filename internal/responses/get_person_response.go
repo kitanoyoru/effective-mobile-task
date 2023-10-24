@@ -32,7 +32,9 @@ func NewGetPersonResponseFromModel(model models.Person) *GetPersonResponse {
 		r.Age = model.Age.Int64
 	}
 
-	r.Gender = NewGetPersonGenderResponseFromModel(model.Gender)
+	if model.Gender != nil {
+		r.Gender = NewGetPersonGenderResponseFromModel(model.Gender)
+	}
 	if len(model.Country) > 0 {
 		for _, c := range model.Country {
 			r.Country = append(r.Country, NewGetPersonCountryResponseFromModel(c))
@@ -48,7 +50,7 @@ type GetPersonGenderResponse struct {
 	Probability float32 `json:"probability,omitempty"`
 }
 
-func NewGetPersonGenderResponseFromModel(model models.PersonGender) *GetPersonGenderResponse {
+func NewGetPersonGenderResponseFromModel(model *models.PersonGender) *GetPersonGenderResponse {
 	r := GetPersonGenderResponse{}
 
 	r.Gender = model.Gender
@@ -62,7 +64,7 @@ type GetPersonCountryResponse struct {
 	Probability float32 `json:"probability"`
 }
 
-func NewGetPersonCountryResponseFromModel(model models.PersonCountry) *GetPersonCountryResponse {
+func NewGetPersonCountryResponseFromModel(model *models.PersonCountry) *GetPersonCountryResponse {
 	r := GetPersonCountryResponse{}
 
 	r.CountryID = model.CountryID

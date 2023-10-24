@@ -25,6 +25,7 @@ func (s *EventBusSession) PublishEvent(ctx context.Context, topic string, event 
 		log.Debug("PublishEvent timeout")
 		return
 	default:
+		log.Debugf("Event published in %v topic", topic)
 		s.bus.Publish(topic, event)
 	}
 }

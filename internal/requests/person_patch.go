@@ -1,17 +1,13 @@
 package requests
 
 type PatchPersonRequest struct {
-	Name       string                       `json:"name"`
-	Surname    string                       `json:"surname"`
-	Patronymic *string                      `json:"patronymic,omitempty"`
-	Age        *int64                       `json:"age,omitempty"`
-	Gender     *PatchPersonGenderRequest    `json:"gender,omitempty"`
-	Country    *[]PatchPersonCountryRequest `json:"country,omitempty"`
-}
-
-type PatchPersonGenderRequest struct {
-	Gender      string  `json:"gender"`
-	Probability float32 `json:"probability"`
+	Name              string                      `json:"name"`
+	Surname           string                      `json:"surname"`
+	Patronymic        string                      `json:"patronymic,omitempty"`
+	Age               int64                       `json:"age,omitempty"`
+	Gender            string                      `json:"gender"`
+	GenderProbability float32                     `json:"probability"`
+	Country           []PatchPersonCountryRequest `json:"country,omitempty"`
 }
 
 type PatchPersonCountryRequest struct {

@@ -9,7 +9,6 @@ import (
 	"github.com/kitanoyoru/effective-mobile-task/internal/responses"
 	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/cache"
 	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/store"
-	"github.com/sirupsen/logrus"
 )
 
 type Service struct {
@@ -28,7 +27,6 @@ func (s *Service) GetPerson(ctx context.Context, request *requests.GetPersonRequ
 	var person models.Person
 	var err error
 
-	logrus.Debug(request.ID)
 	person, err = s.cache.PersonRepository.GetPersonByID(ctx, fmt.Sprint(request.ID))
 	if err != nil {
 		person, err = s.db.PersonRepository.Find(ctx, request)
