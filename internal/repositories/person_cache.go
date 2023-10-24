@@ -44,19 +44,19 @@ func NewPersonCacheRepository(client *redis.Client, bus *events.EventBusSession)
 	return r
 }
 
-func (r *PersonCacheRepository) GetPersonByID(ctx context.Context, id string) (*models.Person, error) {
+func (r *PersonCacheRepository) GetPersonByID(ctx context.Context, id string) (models.Person, error) {
 	cacheKey := r.getCacheKey("id", id)
 	personBytes, err := r.client.Get(ctx, cacheKey).Bytes()
 	if err != nil {
-		return nil, err
+		return models.Person{}, err
 	}
 
 	person := models.Person{}
 	if err := json.Unmarshal(personBytes, &person); err != nil {
-		return nil, err
+		return models.Person{}, err
 	}
 
-	return &person, nil
+	return person, nil
 }
 
 func (r *PersonCacheRepository) SetPersonByID(ctx context.Context, id string, person *models.Person) error {

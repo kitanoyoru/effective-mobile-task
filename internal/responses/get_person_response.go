@@ -10,15 +10,15 @@ type GetPersonResponse struct {
 	Name    string `json:"name"`
 	Surname string `json:"surname"`
 
-	Patronymic *string `json:"patronymic,omitempty"`
-	Age        *int64  `json:"age,omitempty"`
+	Patronymic string `json:"patronymic,omitempty"`
+	Age        int64  `json:"age,omitempty"`
 
-	Gender  *GetPersonGenderResponse    `json:"gender"`
-	Country []*GetPersonCountryResponse `json:"country"`
+	Gender  *GetPersonGenderResponse    `json:"gender,omitempty"`
+	Country []*GetPersonCountryResponse `json:"country,omitempty"`
 }
 
 func NewGetPersonResponseFromModel(model models.Person) *GetPersonResponse {
-	r := &GetPersonResponse{}
+	r := GetPersonResponse{}
 
 	r.ID = model.ID
 
@@ -26,15 +26,13 @@ func NewGetPersonResponseFromModel(model models.Person) *GetPersonResponse {
 	r.Surname = model.Surname
 
 	if !model.Patronymic.IsZero() {
-		r.Patronymic = &model.Patronymic.String
+		r.Patronymic = model.Patronymic.String
 	}
 	if !model.Age.IsZero() {
-		r.Age = &model.Age.Int64
+		r.Age = model.Age.Int64
 	}
 
-	if model.Gender != nil {
-		r.Gender = NewGetPersonGenderResponseFromModel(model.Gender)
-	}
+	r.Gender = NewGetPersonGenderResponseFromModel(model.Gender)
 	if len(model.Country) > 0 {
 		for _, c := range model.Country {
 			r.Country = append(r.Country, NewGetPersonCountryResponseFromModel(c))
@@ -42,21 +40,21 @@ func NewGetPersonResponseFromModel(model models.Person) *GetPersonResponse {
 		}
 	}
 
-	return r
+	return &r
 }
 
 type GetPersonGenderResponse struct {
-	Gender      string  `json:"gender"`
-	Probability float32 `json:"probability"`
+	Gender      string  `json:"gender,omitempty"`
+	Probability float32 `json:"probability,omitempty"`
 }
 
-func NewGetPersonGenderResponseFromModel(model *models.PersonGender) *GetPersonGenderResponse {
-	r := &GetPersonGenderResponse{}
+func NewGetPersonGenderResponseFromModel(model models.PersonGender) *GetPersonGenderResponse {
+	r := GetPersonGenderResponse{}
 
 	r.Gender = model.Gender
 	r.Probability = model.Probability
 
-	return r
+	return &r
 }
 
 type GetPersonCountryResponse struct {
@@ -64,12 +62,12 @@ type GetPersonCountryResponse struct {
 	Probability float32 `json:"probability"`
 }
 
-func NewGetPersonCountryResponseFromModel(model *models.PersonCountry) *GetPersonCountryResponse {
-	r := &GetPersonCountryResponse{}
+func NewGetPersonCountryResponseFromModel(model models.PersonCountry) *GetPersonCountryResponse {
+	r := GetPersonCountryResponse{}
 
 	r.CountryID = model.CountryID
 	r.Probability = model.Probability
 
-	return r
+	return &r
 
 }

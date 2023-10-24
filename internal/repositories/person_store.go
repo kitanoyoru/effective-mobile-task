@@ -28,18 +28,16 @@ func NewPersonStoreRepository(db *gorm.DB, bus *events.EventBusSession) *PersonS
 	}
 }
 
-func (r *PersonStoreRepository) Save(ctx context.Context, req *requests.PostPersonRequest) error {
+func (r *PersonStoreRepository) Save(ctx context.Context, req *requests.PostPersonRequest) (int, error) {
 	person := models.Person{
 		Name:       req.Name,
 		Surname:    req.Surname,
 		Patronymic: null.StringFromPtr(req.Patronymic),
 	}
 
-	if err := r.db.WithContext(ctx).Save(person).Error; err != nil {
-		return err
-	}
+	err := r.db.WithContext(ctx).Save(&person).Error
 
-	return nil
+	return person.ID, err
 }
 
 func (r *PersonStoreRepository) Find(ctx context.Context, req *requests.GetPersonRequest) (models.Person, error) {
@@ -49,7 +47,7 @@ func (r *PersonStoreRepository) Find(ctx context.Context, req *requests.GetPerso
 		ID: req.ID,
 	}
 
-	if err := r.db.WithContext(ctx).Preload("Person_Gender").Preload("Person_Country").Where(&search).Take(&person).Error; err != nil {
+	if err := r.db.WithContext(ctx).Model(models.Person{}).Preload("Gender").Preload("Country").Where(&search).Take(&person).Error; err != nil {
 		return models.Person{}, err
 	}
 
@@ -64,7 +62,7 @@ func (r *PersonStoreRepository) Filter(ctx context.Context, req *requests.GetFil
 		Name: req.Name,
 	}
 
-	if err := r.db.WithContext(ctx).Preload("Person_Gender").Preload("Person_Country").Where(&search).Find(&persons).Error; err != nil {
+	if err := r.db.WithContext(ctx).Preload("Gender").Preload("Country").Where(&search).Find(&persons).Error; err != nil {
 		return nil, err
 	}
 

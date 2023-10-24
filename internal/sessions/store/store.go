@@ -1,7 +1,9 @@
 package store
 
 import (
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/kitanoyoru/effective-mobile-task/internal/config"
+	"github.com/kitanoyoru/effective-mobile-task/internal/models"
 	"github.com/kitanoyoru/effective-mobile-task/internal/repositories"
 	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/events"
 	"github.com/kitanoyoru/effective-mobile-task/pkg/database"
@@ -18,6 +20,9 @@ func NewStoreSession(cfg *config.DatabaseConfig, bus *events.EventBusSession) (*
 	if err != nil {
 		return nil, err
 	}
+
+	db.AutoMigrate(models.PersonGender{}, models.PersonCountry{})
+	db.AutoMigrate(models.Person{})
 
 	personRepository := repositories.NewPersonStoreRepository(db, bus)
 

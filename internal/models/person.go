@@ -3,19 +3,47 @@ package models
 import (
 	"github.com/guregu/null"
 	"github.com/kitanoyoru/effective-mobile-task/internal/requests"
+
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
+type PersonGender struct {
+	ID string `gorm:"primary_key" json:"id"`
+
+	Gender      string  `gorm:"column:gender;type:TEXT;not null" json:"gender"`
+	Probability float32 `gorm:"column:probability;type:FLOAT;not null" json:"probability"`
+}
+
+func (p *PersonGender) TableName() string {
+	return "Person_Gender"
+}
+
+type PersonCountry struct {
+	ID string `gorm:"primary_key" json:"id"`
+
+	PersonID int `json:"-"`
+
+	CountryID   string  `gorm:"column:id;type:TEXT;not null" json:"country_id"`
+	Probability float32 `gorm:"column:probability;type:FLOAT;not null" json:"probability"`
+}
+
+func (p *PersonCountry) TableName() string {
+	return "Person_Country"
+}
+
 type Person struct {
-	ID int `gorm:"primary_key;column:id;type:INT;AUTO_INCREMENT" json:"id"`
+	ID int `gorm:"primary_key" json:"id"`
 
-	Name    string `gorm:"column:name;type:TEXT;not null;" json:"name"`
-	Surname string `gorm:"column:surname;type:TEXT;not null;" json:"surname"`
+	Name    string `gorm:"column:name;type:TEXT;not null" json:"name"`
+	Surname string `gorm:"column:surname;type:TEXT;not null" json:"surname"`
 
-	Patronymic null.String `gorm:"column:patronymic;type:TEXT;" json:"patronymic,omitempty"`
-	Age        null.Int    `gorm:"column:age;type:INT;" json:"age,omitempty"`
+	Patronymic null.String `gorm:"column:patronymic;type:TEXT" json:"patronymic,omitempty"`
+	Age        null.Int    `gorm:"column:age;type:INT" json:"age,omitempty"`
 
-	Gender  *PersonGender    `gorm:"foreignKey:PersonID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"gender;"`
-	Country []*PersonCountry `gorm:"foreignKey:PersonID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"country;"`
+	GenderID *int         `json:"-"`
+	Gender   PersonGender `gorm:"foreignKey:GenderID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"gender"`
+
+	Country []PersonCountry `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"country"`
 }
 
 func (p *Person) MergeWithPatchRequest(req *requests.PatchPersonRequest) {
@@ -36,17 +64,14 @@ func (p *Person) MergeWithPatchRequest(req *requests.PatchPersonRequest) {
 	}
 
 	if req.Gender != nil {
-		if p.Gender == nil {
-			p.Gender = &PersonGender{}
-		}
 		p.Gender.Gender = req.Gender.Gender
 		p.Gender.Probability = req.Gender.Probability
 	}
 
 	if req.Country != nil {
-		var countries []*PersonCountry
+		var countries []PersonCountry
 		for _, countryRequest := range *req.Country {
-			country := &PersonCountry{
+			country := PersonCountry{
 				CountryID:   countryRequest.CountryID,
 				Probability: countryRequest.Probability,
 			}
@@ -57,30 +82,4 @@ func (p *Person) MergeWithPatchRequest(req *requests.PatchPersonRequest) {
 }
 func (p *Person) TableName() string {
 	return "Person"
-}
-
-type PersonGender struct {
-	ID string `gorm:"primary_key;column:id;type:INT;AUTO_INCREMENT;" json:"id"`
-
-	Gender      string  `gorm:"column:gender;type:TEXT;not null;" json:"gender"`
-	Probability float32 `gorm:"column:probability;type:FLOAT;not null;" json:"probability"`
-
-	PersonID string `gorm:"column:personID;type:TEXT;" json:"personID"`
-}
-
-func (p *PersonGender) TableName() string {
-	return "Person_Gender"
-}
-
-type PersonCountry struct {
-	ID string `gorm:"primary_key;column:id;type:INT;AUTO_INCREMENT;" json:"id"`
-
-	CountryID   string  `gorm:"column:id;type:TEXT;not null;" json:"country_id"`
-	Probability float32 `gorm:"column:probability;type:FLOAT;not null;" json:"probability"`
-
-	PersonID string `gorm:"column:personID;type:TEXT;" json:"personID"`
-}
-
-func (p *PersonCountry) TableName() string {
-	return "Person_Country"
 }

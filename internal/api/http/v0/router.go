@@ -41,9 +41,9 @@ func (api *HTTPApi) GetHTTPRouter() *chi.Mux {
 		r.Route(apiPersonRoutesPrefix, func(r chi.Router) {
 			r.With(api.GetPersonRequestCtx).Get("/{person_id}", api.getPersonRequestHandler)
 			r.With(api.GetFilterPersonRequestCtx).Get("/", api.getFilterPersonRequestHandler)
-			r.Post("/", api.postPersonRequestHandler)
+			r.With(api.PostPersonRequestCtx).Post("/", api.postPersonRequestHandler)
 			r.Patch("/", api.patchPersonRequetHandler)
-			r.Delete("/", api.deletePersonRequestHanndler)
+			r.With(api.DeletePersonRequestCtx).Delete("/", api.deletePersonRequestHanndler)
 		})
 	})
 

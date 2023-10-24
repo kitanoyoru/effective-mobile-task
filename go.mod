@@ -6,10 +6,10 @@ require (
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/caarlos0/env/v9 v9.0.0
 	github.com/go-chi/chi/v5 v5.0.10
-	github.com/go-chi/docgen v1.2.0
 	github.com/go-chi/render v1.0.3
 	github.com/gojek/heimdall v5.0.2+incompatible
 	github.com/guregu/null v4.0.0+incompatible
+	github.com/jinzhu/gorm v1.9.16
 	github.com/pressly/goose/v3 v3.15.1
 	github.com/redis/go-redis/v9 v9.2.1
 	github.com/samber/lo v1.38.1
@@ -32,6 +32,7 @@ require (
 	github.com/jackc/pgx/v5 v5.4.3 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/lib/pq v1.10.9 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/smartystreets/goconvey v1.8.1 // indirect

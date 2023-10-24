@@ -13,7 +13,9 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Host  string `env:"HOST"`
+	Host string `env:"SERVER_HOST" envDefault:"localhost"`
+	Port string `env:"SERVER_PORT" envDefault:"8000"`
+
 	Https HttpsConfig
 	Cors  bool `env:"ENABLE_CORS" envDefault:"true"`
 }
