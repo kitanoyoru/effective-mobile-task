@@ -1,7 +1,7 @@
 {
   "_type": "export",
   "__export_format": 4,
-  "__export_date": "2023-10-25T00:42:09.982Z",
+  "__export_date": "2023-10-25T09:38:59.843Z",
   "__export_source": "insomnia.desktop.app:v8.3.0",
   "resources": [
     {
@@ -46,9 +46,9 @@
     {
       "_id": "req_4e7e4e8402d541e6a6aaa2d6aec93d6e",
       "parentId": "wrk_57eebdbaa8554346a847e94d7a940138",
-      "modified": 1698189525405,
+      "modified": 1698200693200,
       "created": 1698188018235,
-      "url": "http://localhost:8000/api/v0/person/4",
+      "url": "http://localhost:8000/api/v0/person/1",
       "name": "Delete Person",
       "description": "",
       "method": "DELETE",
@@ -69,9 +69,9 @@
     {
       "_id": "req_82de9d6ed4b240838326fd4545af4fb8",
       "parentId": "wrk_57eebdbaa8554346a847e94d7a940138",
-      "modified": 1698188003362,
+      "modified": 1698226652888,
       "created": 1698187921282,
-      "url": "http://localhost:8000/api/v0/person?name=Vanya",
+      "url": "http://localhost:8000/api/v0/person?name=Vanya&page=1&limit=5",
       "name": "Filter Persons",
       "description": "",
       "method": "GET",
@@ -92,9 +92,9 @@
     {
       "_id": "req_f3210b2752f74dafbedc24a109dc9e5a",
       "parentId": "wrk_57eebdbaa8554346a847e94d7a940138",
-      "modified": 1698189534443,
+      "modified": 1698226436335,
       "created": 1698056981692,
-      "url": "http://localhost:8000/api/v0/person/5",
+      "url": "http://localhost:8000/api/v0/person/1",
       "name": "Get Person By ID",
       "description": "",
       "method": "GET",
@@ -115,7 +115,7 @@
     {
       "_id": "req_d62059a0d73146c6af95fff252a73bab",
       "parentId": "wrk_57eebdbaa8554346a847e94d7a940138",
-      "modified": 1698187987477,
+      "modified": 1698226596415,
       "created": 1698056625038,
       "url": "http://localhost:8000/api/v0/person",
       "name": "Post Person",
@@ -123,7 +123,7 @@
       "method": "POST",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n\"name\": \"Vanya\",\n\"surname\": \"Ushakov\",\n\"patronymic\": \"Vasilevich\"\n}"
+        "text": "{\n\"name\": \"Vanya\",\n\"surname\": \"Ushakov\"\n}"
       },
       "parameters": [],
       "headers": [

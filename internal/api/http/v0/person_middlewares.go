@@ -39,6 +39,7 @@ func (api *HTTPApi) GetFilterPersonRequestCtx(next http.Handler) http.Handler {
 
 		query := r.URL.Query()
 
+		// REFACTOR: need to do smth with this block of code
 		if id := query.Get("id"); id != "" {
 			pid, _ := strconv.Atoi(id)
 			getFilterPersonRequest.ID = pid
@@ -49,11 +50,15 @@ func (api *HTTPApi) GetFilterPersonRequestCtx(next http.Handler) http.Handler {
 		if surname := query.Get("surname"); surname != "" {
 			getFilterPersonRequest.Surname = surname
 		}
-		if gender := query.Get("gender"); gender != "" {
-			getFilterPersonRequest.Gender = gender
+
+		// REFACTOR: move pagination from FilterRequest in another middleware, but for now - ok
+		if page := query.Get("page"); page != "" {
+			parsedPage, _ := strconv.Atoi(page)
+			getFilterPersonRequest.Page = parsedPage
 		}
-		if countryID := query.Get("countryID"); countryID != "" {
-			getFilterPersonRequest.CountryID = countryID
+		if limit := query.Get("limit"); limit != "" {
+			parsedLimit, _ := strconv.Atoi(limit)
+			getFilterPersonRequest.Limit = parsedLimit
 		}
 
 		ctx := context.WithValue(r.Context(), "GetFilterPersonRequest", &getFilterPersonRequest)

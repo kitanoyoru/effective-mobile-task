@@ -19,8 +19,6 @@ source config/env.local.prod
 
 make tidy && make build
 
-./
-
 ```
 
 You can checkout description of the project and for each command (and their params) in the CLI

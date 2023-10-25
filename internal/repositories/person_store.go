@@ -71,15 +71,11 @@ func (r *PersonStoreRepository) Filter(ctx context.Context, req *requests.GetFil
 		ID:      req.ID,
 		Name:    req.Name,
 		Surname: req.Surname,
-		Gender: models.PersonGender{
-			Gender: req.Gender,
-		},
-		Country: []models.PersonCountry{
-			{CountryID: req.CountryID},
-		},
 	}
 
-	if err := r.db.WithContext(ctx).Preload("Gender").Preload("Country").Where(&search).Find(&persons).Error; err != nil {
+	offset := (req.Page - 1) * req.Limit
+
+	if err := r.db.WithContext(ctx).Preload("Gender").Preload("Country").Offset(offset).Where(&search).Find(&persons).Limit(req.Limit).Error; err != nil {
 		return nil, err
 	}
 

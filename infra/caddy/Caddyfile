@@ -1,8 +1,7 @@
 :8000 {
-  proxy / app:8000 {
-    transparent
+  log {
+    level DEBUG
   }
 
-  errors stderr
-  tls off
+  reverse_proxy app:8000
 }

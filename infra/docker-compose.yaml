@@ -1,13 +1,11 @@
 version: "3.8"
 services:
-  #  caddy:
-  #    image: caddy
-  #  ports:
-  #    - "8000:8000"
-  #  networks:
-  #    - caddy-net
-  #  volumes:
-  #    - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+  caddy:
+    image: caddy
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
 
   app:
     build:
@@ -15,12 +13,10 @@ services:
       dockerfile: Dockerfile
     env_file:
       - ../config/prod.docker.env
-        # networks:
-        #- caddy-net
-    ports:
-      - ${SERVER_PORT}:${SERVER_PORT}
+        #ports:
+        #- ${SERVER_PORT}:${SERVER_PORT}
     depends_on:
-      #- caddy
+      - caddy
       - postgres
       - redis
 
