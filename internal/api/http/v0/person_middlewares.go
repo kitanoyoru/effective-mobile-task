@@ -46,6 +46,15 @@ func (api *HTTPApi) GetFilterPersonRequestCtx(next http.Handler) http.Handler {
 		if name := query.Get("name"); name != "" {
 			getFilterPersonRequest.Name = name
 		}
+		if surname := query.Get("surname"); surname != "" {
+			getFilterPersonRequest.Surname = surname
+		}
+		if gender := query.Get("gender"); gender != "" {
+			getFilterPersonRequest.Gender = gender
+		}
+		if countryID := query.Get("countryID"); countryID != "" {
+			getFilterPersonRequest.CountryID = countryID
+		}
 
 		ctx := context.WithValue(r.Context(), "GetFilterPersonRequest", &getFilterPersonRequest)
 

@@ -5,8 +5,11 @@ type DeletePersonRequest struct {
 }
 
 type GetFilterPersonRequest struct {
-	ID   int    `json:"id,omitempty"`
-	Name string `json:"name,omitempty"`
+	ID        int    `json:"id,omitempty"`
+	Name      string `json:"name,omitempty"`
+	Surname   string `json:"surname,omitempty"`
+	Gender    string `json:"gender,omitempty"`
+	CountryID string `json:"country_id,omitempty"`
 }
 
 type GetPersonRequest struct {

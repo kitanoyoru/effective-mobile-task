@@ -35,7 +35,7 @@ RUN chown ${USER}:${USER} /var/run/app
 
 COPY --from=build /bin/effective-mobile-task /usr/local/bin/effective-mobile-task
 
-COPY static /usr/share/effective-mobile-task
+COPY static /usr/share/effective-mobile-task/static
 
 COPY infra/docker-entrypoint.sh /usr/local/bin/
 RUN chmod 755 /usr/local/bin/docker-entrypoint.sh

@@ -16,5 +16,3 @@ func (api *HTTPApi) renderIndexPage(w http.ResponseWriter, r *http.Request) {
 
 	utils.RespondWithTemplate(w, tmpl, nil)
 }
-
-func (api *HTTPApi) renderAppVersionPage(w http.ResponseWriter, r *http.Request) {}

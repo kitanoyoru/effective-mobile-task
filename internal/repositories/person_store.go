@@ -68,8 +68,15 @@ func (r *PersonStoreRepository) Filter(ctx context.Context, req *requests.GetFil
 	var persons []models.Person
 
 	search := models.Person{
-		ID:   req.ID,
-		Name: req.Name,
+		ID:      req.ID,
+		Name:    req.Name,
+		Surname: req.Surname,
+		Gender: models.PersonGender{
+			Gender: req.Gender,
+		},
+		Country: []models.PersonCountry{
+			{CountryID: req.CountryID},
+		},
 	}
 
 	if err := r.db.WithContext(ctx).Preload("Gender").Preload("Country").Where(&search).Find(&persons).Error; err != nil {

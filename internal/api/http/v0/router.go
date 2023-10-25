@@ -41,7 +41,6 @@ func (api *HTTPApi) GetHTTPRouter() *chi.Mux {
 	r.Route(apiPrefix, func(r chi.Router) {
 		r.Route(apiBaseRoutesPrefix, func(r chi.Router) {
 			r.Get("/", api.renderIndexPage)
-			r.Get("/version", api.renderAppVersionPage)
 		})
 		r.Route(apiPersonRoutesPrefix, func(r chi.Router) {
 			r.With(api.GetPersonRequestCtx).Get("/{person_id}", api.getPersonRequestHandler)

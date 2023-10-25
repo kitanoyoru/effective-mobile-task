@@ -84,5 +84,5 @@ func (s *Service) PatchPerson(ctx context.Context, request *requests.PatchPerson
 }
 
 func (s *Service) GetTemplatePath(template string) string {
-	return filepath.Join(sharePublicFolter, "static", "tempates", template)
+	return filepath.Join(sharePublicFolter, "static", "templates", template)
 }
