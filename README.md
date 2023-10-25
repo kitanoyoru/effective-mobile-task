@@ -19,6 +19,9 @@ source config/env.local.prod
 
 make tidy && make build
 
+# or you can use just thihs to start server
+make start-local
+
 ```
 
 You can checkout description of the project and for each command (and their params) in the CLI
@@ -53,9 +56,7 @@ Start server
 ### In Docker
 
 ```sh
-source config/env.docker.prod
-
-docker compose -f infra/docker-compose.yaml up -d
+make start-docker
 ```
 
 ## Troubleshooting
