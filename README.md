@@ -4,10 +4,11 @@ This project contains my version of the solution on Effective-Mobile task on the
 Golang Developper
 
 ## Installation
+
 ### Locally
 
-
 Build cli tool:
+
 ```sh
 source config/env.local.prod
 
@@ -18,6 +19,7 @@ make tidy && make build
 ```
 
 You can checkout description of project and each command (and their params) in the CLI
+
 ```
 Usage:
   effective-mobile-task [command]
@@ -34,15 +36,16 @@ Flags:
 ```
 
 Make migrations to the database:
+
 ```sh
 ./effective-mobile-task migrate
 ```
 
 Start server
+
 ```sh
 ./effective-mobile-task server
 ```
-
 
 ### In Docker
 

@@ -46,7 +46,6 @@ type RedisConfig struct {
 	Host     string `env:"CACHE_HOST"`
 	Port     string `env:"CACHE_PORT"`
 	Name     string `env:"CACHE_NAME"`
-	User     string `env:"CACHE_USER"`
 	Password string `env:"CACHE_PASSWORD"`
 	Database int    `env:"CACHE_DB_NAME"`
 }
