@@ -1,5 +1,11 @@
 # Effective-Mobile Junior Golang task
 
+
+## Installation
+### Locally
+
+
+Build cli tool:
 This project contains my version of the solution on Effective-Mobile task on the Junior/Junior+
 Golang Developper
 
@@ -8,7 +14,6 @@ Golang Developper
 ### Locally
 
 Build cli tool:
-
 ```sh
 source config/env.local.prod
 
@@ -18,9 +23,8 @@ make tidy && make build
 
 ```
 
-You can checkout description of project and each command (and their params) in the CLI
-
-```
+You can checkout description of the project and for each command (and their params) in the CLI
+```sh
 Usage:
   effective-mobile-task [command]
 
