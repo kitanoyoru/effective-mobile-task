@@ -1,8 +1,17 @@
 # Effective-Mobile Junior Golang task
 
+
 ## Installation
 ### Locally
 
+
+Build cli tool:
+This project contains my version of the solution on Effective-Mobile task on the Junior/Junior+
+Golang Developper
+
+## Installation
+
+### Locally
 
 Build cli tool:
 ```sh
@@ -14,7 +23,38 @@ make tidy && make build
 
 ```
 
-Make migrations to the database:
+You can checkout description of the project and for each command (and their params) in the CLI
 ```sh
-./app migrate
+Usage:
+  effective-mobile-task [command]
+
+Available Commands:
+  completion  Generate the autocompletion script for the specified shell
+  help        Help about any command
+  migrate     Migrate schema in database
+  server      Start server
+
+Flags:
+      --dev    use development version
+  -h, --help   help for effective-mobile-task
+```
+
+Make migrations to the database:
+
+```sh
+./effective-mobile-task migrate
+```
+
+Start server
+
+```sh
+./effective-mobile-task server
+```
+
+### In Docker
+
+```sh
+source config/env.docker.prod
+
+docker compose up -f infra/docker-compose.yaml -d
 ```
