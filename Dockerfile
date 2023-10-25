@@ -1,5 +1,4 @@
 FROM golang:1.21.1-bullseye AS build
-#FROM kitanoyoru/effective-mobile/base-builder:latest AS build
 
 LABEL maintainer="Alexandr Rutkowski <kitanoyoru@protonmail.com>"
 
@@ -15,11 +14,10 @@ COPY internal internal
 COPY pkg pkg
 
 RUN go mod tidy
-RUN go build -o /bin/app cmd/main.go
+RUN go build -o /bin/effective-mobile-task cmd/main.go
 RUN rm -rf ${PROJECT_DIR}
 
-# REFACTOR: chnage to debian-slim
-FROM ubuntu:latest
+FROM debian:buster-slim
 
 ENV USER kitanoyoru
 
@@ -34,9 +32,13 @@ RUN set -ex; \
 RUN mkdir /var/run/app
 RUN chown ${USER}:${USER} /var/run/app
 
-COPY --from=build /bin/app /usr/local/bin/app
+COPY --from=build /bin/effective-mobile-task /usr/local/bin/effective-mobile-task
+
+COPY infra/docker-entrypoint.sh /usr/local/bin/
+RUN chmod 755 /usr/local/bin/docker-entrypoint.sh
+
 
 USER ${USER}
 WORKDIR /home/${USER}
 
-CMD ["app", "server"]
+ENTRYPOINT ["docker-entrypoint.sh"]

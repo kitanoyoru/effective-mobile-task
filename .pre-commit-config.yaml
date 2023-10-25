@@ -24,13 +24,6 @@ repos:
       - id: mixed-line-ending
         args: [--fix=lf]
 
-  - repo: https://github.com/jumanjihouse/pre-commit-hooks
-    rev: 3.0.0
-    hooks:
-      - id: shfmt
-        args: ["-l", "-i", "2", "-ci", "-sr", "-w"]
-      - id: shellcheck
-
   - repo: https://github.com/dnephin/pre-commit-golang
     rev: v0.5.0
     hooks:
