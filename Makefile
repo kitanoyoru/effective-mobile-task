@@ -10,7 +10,7 @@ tidy:
 
 .PHONY: build
 build:
-	@go build -o app ./cmd/main.go
+	@go build -o effective-mobile-task ./cmd/main.go
 
 .PHONY: test
 test:
