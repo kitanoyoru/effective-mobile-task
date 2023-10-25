@@ -3,7 +3,7 @@ package v0
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/render"
+	"github.com/go-chi/cors"
 	"github.com/kitanoyoru/effective-mobile-task/internal/service"
 )
 
@@ -31,7 +31,12 @@ func (api *HTTPApi) GetHTTPRouter() *chi.Mux {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.URLFormat)
-	r.Use(render.SetContentType(render.ContentTypeJSON))
+
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+	}))
 
 	r.Route(apiPrefix, func(r chi.Router) {
 		r.Route(apiBaseRoutesPrefix, func(r chi.Router) {
