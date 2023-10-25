@@ -9,7 +9,7 @@ import (
 var migrationCommand = &cobra.Command{
 	Use:   "migrate",
 	Short: "Migrate schema in database",
-	Long:  "Need to write smth here",
+	Long:  "Used to create schema in specified in your environment database.",
 	Run: func(cmd *cobra.Command, args []string) {
 		s, err := migrate.NewMigrateSession(&cfg.Database)
 		if err != nil {

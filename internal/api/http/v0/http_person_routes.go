@@ -8,10 +8,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// @title chi-swagger example APIs
-// @version 1.0
-// @description chi-swagger example APIs
-// @BasePath /
 func (api *HTTPApi) getPersonRequestHandler(w http.ResponseWriter, r *http.Request) {
 	getPersonRequest := r.Context().Value("GetPersonRequest").(*requests.GetPersonRequest)
 

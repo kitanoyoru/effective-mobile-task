@@ -3,12 +3,17 @@ package service
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 
 	"github.com/kitanoyoru/effective-mobile-task/internal/models"
 	"github.com/kitanoyoru/effective-mobile-task/internal/requests"
 	"github.com/kitanoyoru/effective-mobile-task/internal/responses"
 	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/cache"
 	"github.com/kitanoyoru/effective-mobile-task/internal/sessions/store"
+)
+
+const (
+	sharePublicFolter = "/usr/share/effective-mobile-task"
 )
 
 type Service struct {
@@ -76,4 +81,8 @@ func (s *Service) PatchPerson(ctx context.Context, request *requests.PatchPerson
 	return &responses.PatchPersonResponse{
 		ID: request.ID,
 	}, nil
+}
+
+func (s *Service) GetTemplatePath(template string) string {
+	return filepath.Join(sharePublicFolter, "static", "tempates", template)
 }
