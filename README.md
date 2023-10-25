@@ -56,5 +56,12 @@ Start server
 ```sh
 source config/env.docker.prod
 
-docker compose up -f infra/docker-compose.yaml -d
+docker compose -f infra/docker-compose.yaml up -d
 ```
+
+## Troubleshooting
+
+### Failed to start app service in docker-compose
+
+Try again run docker compose up command and everything should works fine. Really don't how to solve
+this problem now, but in a short time i guess patch will be uploaded.
