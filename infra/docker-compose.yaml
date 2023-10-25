@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  caddy:
+    image: caddy
+    ports:
+      - "8000:8000"
+    networks:
+      - caddy-net
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+
+  app:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    env_file:
+      - ../config/prod.docker.env
+    networks:
+      - caddy-net
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=${DATABASE_NAME}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_DB_NAME}
+    ports:
+      - ${DATABASE_PORT}:6379
+
+  redis:
+    image: redis:latest
+    restart: always
+    environment:
+      - REDIS_PASSWORD=${CACHE_PASSWORD}
+    ports:
+      - ${CACHE_PORT}:5432
